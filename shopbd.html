@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopBD - Bangladesh's Marketplace</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1a7a4a;--green-light:#e6f4ed;--green-dark:#0f4f2e;
+  --orange:#e8600a;--orange-light:#fff0e6;
+  --gray-50:#f8f9fa;--gray-100:#f1f3f5;--gray-200:#e9ecef;--gray-300:#dee2e6;
+  --gray-600:#6c757d;--gray-800:#343a40;--gray-900:#212529;
+  --white:#ffffff;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.1);
+  --radius:8px;--radius-lg:12px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f0;color:var(--gray-900);font-size:14px;min-height:100vh}
+.topbar{background:var(--green-dark);color:#fff;padding:6px 20px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.topbar a{color:#aee8c8;text-decoration:none;margin-left:12px;cursor:pointer}
+.navbar{background:var(--green);padding:10px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.logo{color:#fff;font-size:22px;font-weight:700;letter-spacing:-.5px;white-space:nowrap;cursor:pointer}
+.logo span{color:#ffd166}
+.search-bar{flex:1;display:flex;max-width:600px}
+.search-bar input{flex:1;padding:9px 14px;border:none;border-radius:4px 0 0 4px;font-size:14px;outline:none}
+.search-bar button{background:var(--orange);color:#fff;border:none;padding:9px 16px;border-radius:0 4px 4px 0;cursor:pointer;font-size:14px}
+.nav-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+.nav-btn{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 12px;border-radius:4px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,.15)}
+.nav-btn .badge{background:var(--orange);color:#fff;border-radius:10px;padding:1px 6px;font-size:11px;font-weight:600}
+.subnav{background:var(--green-dark);padding:6px 20px;display:flex;gap:20px;overflow-x:auto}
+.subnav a{color:#cde8da;font-size:13px;text-decoration:none;white-space:nowrap;cursor:pointer;padding:2px 0}
+.subnav a:hover{color:#fff}
+.page{display:none}.page.active{display:block}
+.hero-grid{display:grid;grid-template-columns:220px 1fr 200px;gap:16px;padding:16px 20px;max-width:1200px;margin:0 auto}
+.sidebar-nav{background:#fff;border-radius:var(--radius);padding:12px 0;box-shadow:var(--shadow)}
+.sidebar-nav h4{padding:8px 16px;font-size:12px;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px}
+.sidebar-nav a{display:block;padding:8px 16px;font-size:13px;color:var(--gray-800);text-decoration:none;cursor:pointer}
+.sidebar-nav a:hover{background:var(--green-light);color:var(--green)}
+.hero-banner{background:linear-gradient(135deg,#1a7a4a 0%,#0f4f2e 60%,#1a5c8a 100%);border-radius:var(--radius-lg);padding:36px 32px;color:#fff;position:relative;overflow:hidden;min-height:180px;display:flex;flex-direction:column;justify-content:center}
+.hero-banner h1{font-size:26px;font-weight:700;margin-bottom:8px;line-height:1.2}
+.hero-banner p{font-size:14px;opacity:.85;margin-bottom:18px}
+.hero-banner .btn-hero{background:var(--orange);color:#fff;border:none;padding:10px 24px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer}
+.hero-deco{position:absolute;right:32px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.15}
+.deals-col{display:flex;flex-direction:column;gap:12px}
+.deal-card{background:#fff;border-radius:var(--radius);padding:12px;box-shadow:var(--shadow);cursor:pointer}
+.deal-card:hover{box-shadow:var(--shadow-md)}
+.deal-label{font-size:11px;font-weight:600;color:var(--orange);text-transform:uppercase;margin-bottom:4px}
+.deal-card h5{font-size:13px;color:var(--gray-800);margin-bottom:2px}
+.deal-card .price{font-size:16px;font-weight:700;color:var(--green)}
+.section{max-width:1200px;margin:0 auto;padding:0 20px 20px}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:20px}
+.section-header h2{font-size:18px;font-weight:600}
+.section-header a{color:var(--green);font-size:13px;cursor:pointer;text-decoration:none}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.product-card{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .2s}
+.product-card:hover{box-shadow:var(--shadow-md)}
+.product-img{width:100%;height:150px;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--gray-50)}
+.product-info{padding:10px}
+.product-info h4{font-size:13px;color:var(--gray-800);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-info .price{font-size:15px;font-weight:700;color:var(--gray-900)}
+.product-info .original{font-size:12px;color:var(--gray-600);text-decoration:line-through;margin-left:4px}
+.product-info .discount{font-size:11px;color:var(--orange);font-weight:600}
+.stars{color:#f39c12;font-size:11px;margin:3px 0}
+.add-cart-btn{width:100%;background:var(--orange-light);color:var(--orange);border:1px solid var(--orange);padding:6px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;margin-top:6px}
+.add-cart-btn:hover{background:var(--orange);color:#fff}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px}
+.cat-card{background:#fff;border-radius:var(--radius);padding:16px 8px;text-align:center;box-shadow:var(--shadow);cursor:pointer}
+.cat-card:hover{background:var(--green-light)}
+.cat-card .icon{font-size:28px;margin-bottom:6px}
+.cat-card span{font-size:12px;color:var(--gray-800)}
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none}
+.cart-overlay.open{display:block}
+.cart-panel{position:fixed;right:0;top:0;bottom:0;width:360px;background:#fff;z-index:201;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.15);display:none}
+.cart-panel.open{display:flex}
+.cart-head{background:var(--green);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.cart-head h3{font-size:16px;font-weight:600}
+.cart-items{flex:1;overflow-y:auto;padding:12px}
+.cart-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-200)}
+.cart-item .thumb{width:52px;height:52px;background:var(--gray-100);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.cart-item .details{flex:1}
+.cart-item .details h5{font-size:13px;margin-bottom:2px}
+.cart-item .details .cprice{font-size:13px;font-weight:600;color:var(--green)}
+.qty-ctrl{display:flex;align-items:center;gap:6px;margin-top:4px}
+.qty-ctrl button{background:var(--gray-200);border:none;width:22px;height:22px;border-radius:3px;cursor:pointer;font-size:13px;font-weight:600}
+.qty-ctrl span{font-size:13px;font-weight:500;min-width:20px;text-align:center}
+.cart-remove{background:none;border:none;color:var(--gray-600);cursor:pointer;font-size:16px;margin-left:auto;align-self:flex-start}
+.cart-footer{padding:16px;border-top:1px solid var(--gray-200)}
+.cart-total{display:flex;justify-content:space-between;font-size:15px;font-weight:600;margin-bottom:12px}
+.checkout-btn{width:100%;background:var(--orange);color:#fff;border:none;padding:12px;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer}
+.empty-cart{text-align:center;padding:40px 20px;color:var(--gray-600)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius-lg);width:400px;overflow:hidden;box-shadow:var(--shadow-md)}
+.modal-head{background:var(--green);color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:18px;font-weight:600}
+.modal-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer}
+.modal-body{padding:24px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;color:var(--gray-800)}
+.form-group input,.form-group select{width:100%;padding:9px 12px;border:1px solid var(--gray-300);border-radius:4px;font-size:14px;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--green)}
+.form-submit{width:100%;background:var(--green);color:#fff;border:none;padding:11px;border-radius:4px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.form-submit:hover{background:var(--green-dark)}
+.modal-tabs{display:flex;border-bottom:2px solid var(--gray-200);margin-bottom:20px}
+.modal-tab{flex:1;padding:10px;border:none;background:none;font-size:13px;font-weight:500;cursor:pointer;color:var(--gray-600)}
+.modal-tab.active{color:var(--green);border-bottom:2px solid var(--green);margin-bottom:-2px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dashboard{max-width:1200px;margin:0 auto;padding:20px}
+.dash-header{margin-bottom:20px}
+.dash-header h2{font-size:22px;font-weight:600}
+.dash-header p{color:var(--gray-600);font-size:14px}
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.metric-card{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.metric-card .label{font-size:12px;color:var(--gray-600);margin-bottom:6px}
+.metric-card .value{font-size:22px;font-weight:700}
+.metric-card .change{font-size:12px;margin-top:4px}
+.change.up{color:#1a7a4a}
+.dash-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.dash-card{background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.dash-card h3{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.dash-card h3 button{font-size:12px;background:var(--green);color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer}
+.table{width:100%;border-collapse:collapse;font-size:13px}
+.table th{text-align:left;padding:8px 10px;color:var(--gray-600);font-weight:500;border-bottom:1px solid var(--gray-200)}
+.table td{padding:8px 10px;border-bottom:1px solid var(--gray-100)}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-active{background:#e6f4ed;color:#1a7a4a}
+.badge-pending{background:var(--orange-light);color:var(--orange)}
+.badge-sold{background:#e8f0fe;color:#1a56db}
+.add-product-form{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-top:16px}
+.add-product-form h3{font-size:15px;font-weight:600;margin-bottom:16px}
+.progress-bar{background:var(--gray-200);border-radius:4px;height:6px;margin-top:6px}
+.progress-fill{background:var(--green);height:6px;border-radius:4px}
+.checkout-page{max-width:900px;margin:0 auto;padding:20px}
+.checkout-page h2{font-size:20px;font-weight:600;margin-bottom:20px}
+.checkout-grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+.checkout-section{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.checkout-section h3{font-size:15px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--gray-200)}
+.order-summary{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);height:fit-content}
+.order-line{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
+.order-line.total{font-weight:700;font-size:15px;border-top:1px solid var(--gray-200);padding-top:10px;margin-top:5px}
+.place-order-btn{width:100%;background:var(--orange);color:#fff;border:none;padding:14px;border-radius:4px;font-size:16px;font-weight:600;cursor:pointer;margin-top:14px}
+.notification{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;z-index:400;transform:translateY(60px);opacity:0;transition:all .3s;max-width:300px}
+.notification.show{transform:translateY(0);opacity:1}
+/* WALLET */
+.wallet-page{max-width:700px;margin:0 auto;padding:20px}
+.wtab-bar{display:flex;border-bottom:1px solid var(--gray-200);background:#fff;border-radius:var(--radius) var(--radius) 0 0;overflow:hidden}
+.wtab{flex:1;padding:12px 8px;border:none;background:none;font-size:13px;font-weight:500;color:var(--gray-600);cursor:pointer;border-bottom:2px solid transparent}
+.wtab.active{color:var(--green);border-bottom-color:var(--green)}
+.wpage{display:none;background:#fff;border-radius:0 0 var(--radius) var(--radius);padding:16px;box-shadow:var(--shadow)}
+.wpage.active{display:block}
+.wallet-banner{text-align:center;padding:20px;background:linear-gradient(135deg,#1a7a4a,#0f4f2e);border-radius:var(--radius);color:#fff;margin-bottom:16px}
+.wallet-banner .wbal{font-size:30px;font-weight:700}
+.wcard{border:1px solid var(--gray-200);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.wcard-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-weight:600;font-size:14px}
+.method-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:8px}
+.method-item.def{border-color:var(--green);border-width:2px}
+.micon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.minfo{flex:1}
+.mname{font-size:13px;font-weight:600}
+.mnum{font-size:12px;color:var(--gray-600)}
+.mbadge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:11px;font-weight:600}
+.mbadge-def{background:var(--green-light);color:var(--green)}
+.mbadge-owner{background:var(--orange-light);color:var(--orange)}
+.prov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.prov-btn{padding:10px 6px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:#fff;cursor:pointer;text-align:center;font-size:12px;font-weight:500;color:var(--gray-600)}
+.prov-btn.sel{border-color:var(--green);color:var(--green);background:var(--green-light)}
+.prov-btn .pi{font-size:20px;display:block;margin-bottom:3px}
+.tx-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-100)}
+.tx-row:last-child{border:none}
+.tx-ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.tx-ic.in{background:var(--green-light);color:var(--green)}
+.tx-ic.out{background:var(--orange-light);color:var(--orange)}
+.tx-info{flex:1}
+.tx-t{font-size:13px;font-weight:500}
+.tx-s{font-size:11px;color:var(--gray-600);margin-top:1px}
+.tx-amt{font-size:13px;font-weight:700}
+.tx-amt.in{color:var(--green)}
+.tx-amt.out{color:var(--orange)}
+.qa-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.qa-btn{padding:12px 6px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);cursor:pointer;text-align:center}
+.qa-btn .qai{font-size:22px;margin-bottom:4px;display:block}
+.qa-btn span{font-size:12px;color:var(--gray-700)}
+/* OWNER LOGIN */
+.owner-login-wrap{min-height:300px;display:flex;align-items:center;justify-content:center;padding:20px;background:#fff;border-radius:0 0 var(--radius) var(--radius)}
+.obox{background:var(--gray-50);border-radius:var(--radius-lg);width:300px;overflow:hidden;border:1px solid var(--gray-200)}
+.obox-head{background:var(--green-dark);color:#fff;padding:18px 20px}
+.obox-head h3{font-size:16px;font-weight:600}
+.obox-head p{font-size:12px;opacity:.7;margin-top:2px}
+.obox-body{padding:18px}
+.oerr{background:#ffe5e5;color:#c0392b;border-radius:4px;padding:8px 12px;font-size:13px;margin-bottom:10px;display:none}
+.owner-section{background:var(--orange-light);border:1px solid #ffd0a0;border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.owner-section-title{font-size:13px;font-weight:600;color:var(--orange);margin-bottom:10px}
+.btn-close-x{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span>🇧🇩 Delivering across Bangladesh &bull; Free shipping over ৳500</span>
+  <div>
+    <a onclick="showPage('home')">Help</a>
+    <a onclick="showPage('home')">Track Order</a>
+    <a onclick="openAuth('seller')">Sell on ShopBD</a>
+    <a onclick="showPage('wallet')">My Wallet</a>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo" onclick="showPage('home')">Shop<span>BD</span></div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search products, brands and more..." oninput="filterProducts(this.value)">
+    <button onclick="filterProducts(document.getElementById('searchInput').value)">&#128269;</button>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="openAuth('login')">&#128100; <span id="navUserLabel">Sign In</span></button>
+    <button class="nav-btn" onclick="showPage('wallet')">&#128179; Wallet</button>
+    <button class="nav-btn" onclick="toggleCart()">&#128722; Cart <span class="badge" id="cartCount">0</span></button>
+    <button class="nav-btn" onclick="showPage('dashboard')">&#128202; Dashboard</button>
+  </div>
+</div>
+
+<!-- SUBNAV -->
+<div class="subnav">
+  <a onclick="filterCat('all')">All Products</a>
+  <a onclick="filterCat('electronics')">Electronics</a>
+  <a onclick="filterCat('fashion')">Fashion</a>
+  <a onclick="filterCat('home')">Home &amp; Living</a>
+  <a onclick="filterCat('groceries')">Groceries</a>
+  <a onclick="filterCat('beauty')">Beauty</a>
+  <a onclick="filterCat('sports')">Sports</a>
+  <a onclick="filterCat('books')">Books</a>
+  <a onclick="showPage('dashboard')">Seller Center</a>
+  <a onclick="showPage('wallet')">My Wallet</a>
+</div>
+
+<!-- ===== HOME ===== -->
+<div id="page-home" class="page active">
+  <div class="hero-grid">
+    <div class="sidebar-nav">
+      <h4>Categories</h4>
+      <a onclick="filterCat('electronics')">&#128241; Electronics</a>
+      <a onclick="filterCat('fashion')">&#128247; Fashion</a>
+      <a onclick="filterCat('home')">&#127968; Home &amp; Living</a>
+      <a onclick="filterCat('groceries')">&#128722; Groceries</a>
+      <a onclick="filterCat('beauty')">&#128132; Beauty</a>
+      <a onclick="filterCat('sports')">&#9917; Sports</a>
+      <a onclick="filterCat('books')">&#128218; Books</a>
+      <a onclick="filterCat('all')">&#128278; All Categories</a>
+    </div>
+    <div class="hero-banner">
+      <h1>Shop Everything.<br>Sell Anywhere.</h1>
+      <p>Bangladesh's fastest growing marketplace &mdash; millions of products, thousands of sellers.</p>
+      <button class="btn-hero" onclick="filterCat('all')">Shop Now</button>
+      <div class="hero-deco">&#128717;</div>
+    </div>
+    <div class="deals-col">
+      <div class="deal-card">
+        <div class="deal-label">&#9889; Flash Sale</div>
+        <h5>Daily Deal</h5>
+        <div class="price">৳299</div>
+        <div style="font-size:11px;color:var(--gray-600)">Ends in 02:14:33</div>
+      </div>
+      <div class="deal-card" onclick="filterCat('electronics')">
+        <div class="deal-label">&#128293; Trending</div>
+        <h5>Electronics Sale</h5>
+        <div class="price">Up to 40% off</div>
+      </div>
+      <div class="deal-card" onclick="openAuth('seller')">
+        <div class="deal-label">&#128188; Start Selling</div>
+        <h5>Open your shop</h5>
+        <div style="font-size:12px;color:var(--gray-600)">Free registration</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>Shop by Category</h2></div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="filterCat('electronics')"><div class="icon">&#128241;</div><span>Electronics</span></div>
+      <div class="cat-card" onclick="filterCat('fashion')"><div class="icon">&#128247;</div><span>Fashion</span></div>
+      <div class="cat-card" onclick="filterCat('home')"><div class="icon">&#127968;</div><span>Home</span></div>
+      <div class="cat-card" onclick="filterCat('groceries')"><div class="icon">&#128722;</div><span>Groceries</span></div>
+      <div class="cat-card" onclick="filterCat('beauty')"><div class="icon">&#128132;</div><span>Beauty</span></div>
+      <div class="cat-card" onclick="filterCat('sports')"><div class="icon">&#9917;</div><span>Sports</span></div>
+      <div class="cat-card" onclick="filterCat('books')"><div class="icon">&#128218;</div><span>Books</span></div>
+      <div class="cat-card" onclick="filterCat('all')"><div class="icon">&#128278;</div><span>More</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2 id="productSectionTitle">Featured Products</h2>
+      <a onclick="filterCat('all')">See all &rarr;</a>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+  </div>
+</div>
+
+<!-- ===== SELLER DASHBOARD ===== -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard">
+    <div class="dash-header">
+      <h2>Seller Dashboard</h2>
+      <p id="sellerWelcome">Welcome! Manage your products, orders and earnings.</p>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="label">Total Earnings</div>
+        <div class="value" style="color:var(--green)">৳84,250</div>
+        <div class="change up">&#9650; 12% this month</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Total Orders</div>
+        <div class="value">342</div>
+        <div class="change up">&#9650; 8 new today</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Active Listings</div>
+        <div class="value" id="listingCount">5</div>
+        <div class="change up">Live products</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Seller Rating</div>
+        <div class="value">4.8&#9733;</div>
+        <div class="change up">Top Seller badge</div>
+      </div>
+    </div>
+    <div class="dash-grid">
+      <div>
+        <div class="dash-card">
+          <h3>My Products <button onclick="document.getElementById('addProductForm').scrollIntoView({behavior:'smooth'})">+ Add Product</button></h3>
+          <table class="table">
+            <thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead>
+            <tbody id="sellerProductTable"></tbody>
+          </table>
+        </div>
+        <div class="add-product-form" id="addProductForm">
+          <h3>List a New Product</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="e.g. Wireless Earbuds"></div>
+            <div class="form-group"><label>Category</label>
+              <select id="newProductCat">
+                <option value="electronics">Electronics</option>
+                <option value="fashion">Fashion</option>
+                <option value="home">Home &amp; Living</option>
+                <option value="groceries">Groceries</option>
+                <option value="beauty">Beauty</option>
+                <option value="sports">Sports</option>
+                <option value="books">Books</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Price (৳)</label><input type="number" id="newProductPrice" placeholder="e.g. 1200"></div>
+            <div class="form-group"><label>Stock</label><input type="number" id="newProductStock" placeholder="e.g. 50"></div>
+          </div>
+          <div class="form-group"><label>Product Emoji</label><input type="text" id="newProductEmoji" placeholder="e.g. 🎧"></div>
+          <button class="form-submit" onclick="addNewProduct()">List Product</button>
+        </div>
+      </div>
+      <div>
+        <div class="dash-card">
+          <h3>Recent Orders</h3>
+          <table class="table">
+            <thead><tr><th>Order</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>#BD-4821</td><td>৳1,250</td><td><span class="status-badge badge-sold">Shipped</span></td></tr>
+              <tr><td>#BD-4820</td><td>৳850</td><td><span class="status-badge badge-pending">Processing</span></td></tr>
+              <tr><td>#BD-4819</td><td>৳3,400</td><td><span class="status-badge badge-sold">Delivered</span></td></tr>
+              <tr><td>#BD-4818</td><td>৳680</td><td><span class="status-badge badge-active">Confirmed</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dash-card" style="margin-top:16px">
+          <h3>Shop Performance</h3>
+          <div style="font-size:13px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Profile Complete</span><span>85%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
+            <div style="display:flex;justify-content:space-between;margin:10px 0 4px"><span>Response Rate</span><span>96%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:96%"></div></div>
+            <div style="display:flex;justify-content:space-between;margin:10px 0 4px"><span>On-time Shipping</span><span>92%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="nav-btn" style="background:var(--green);color:#fff;padding:10px 24px;border-radius:4px;font-size:14px;border:none;cursor:pointer" onclick="showPage('home')">&larr; Back to Marketplace</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHECKOUT ===== -->
+<div id="page-checkout" class="page">
+  <div class="checkout-page">
+    <button onclick="showPage('home')" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:14px;margin-bottom:16px">&larr; Continue Shopping</button>
+    <h2>Checkout</h2>
+    <div class="checkout-grid">
+      <div>
+        <div class="checkout-section">
+          <h3>Delivery Address</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Full Name</label><input type="text" placeholder="Your name"></div>
+            <div class="form-group"><label>Phone</label><input type="text" placeholder="01XXXXXXXXX"></div>
+          </div>
+          <div class="form-group"><label>Division</label>
+            <select><option>Dhaka</option><option>Chittagong</option><option>Sylhet</option><option>Rajshahi</option><option>Khulna</option><option>Barisal</option><option>Rangpur</option><option>Mymensingh</option></select>
+          </div>
+          <div class="form-group"><label>Full Address</label><input type="text" placeholder="House, road, area..."></div>
+        </div>
+        <div class="checkout-section">
+          <h3>Payment Method</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <label style="display:flex;align-items:center;gap:8px;padding:12px;border:2px solid var(--green);border-radius:6px;cursor:pointer;font-size:13px"><input type="radio" name="payment" checked> &#128247; bKash</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;font-size:13px"><input type="radio" name="payment"> &#128247; Nagad</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;font-size:13px"><input type="radio" name="payment"> &#128179; Rocket</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;font-size:13px"><input type="radio" name="payment"> &#128179; Bank Transfer</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;font-size:13px"><input type="radio" name="payment"> &#128179; Visa/Mastercard</label>
+            <label style="display:flex;align-items:center;gap:8px;padding:12px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;font-size:13px"><input type="radio" name="payment"> &#128181; Cash on Delivery</label>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="order-summary">
+          <h3 style="font-size:15px;font-weight:600;margin-bottom:14px">Order Summary</h3>
+          <div id="checkoutItems"></div>
+          <div class="order-line"><span>Subtotal</span><span id="checkoutSubtotal">৳0</span></div>
+          <div class="order-line"><span>Shipping</span><span>৳60</span></div>
+          <div class="order-line total"><span>Total</span><span id="checkoutTotal">৳60</span></div>
+          <button class="place-order-btn" onclick="placeOrder()">Place Order &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== WALLET ===== -->
+<div id="page-wallet" class="page">
+  <div class="wallet-page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="font-size:18px;font-weight:600">&#128179; My Wallet</h2>
+      <button onclick="showPage('home')" style="background:none;border:none;cursor:pointer;color:var(--green);font-size:13px">&larr; Back</button>
+    </div>
+    <div class="wtab-bar">
+      <button class="wtab active" onclick="switchWTab('overview')">Overview</button>
+      <button class="wtab" onclick="switchWTab('methods')">Payment Accounts</button>
+      <button class="wtab" onclick="switchWTab('send')">Send / Request</button>
+      <button class="wtab" id="ownerWTab" onclick="switchWTab('ownerlogin')" style="display:none">&#128274; Owner</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div id="wpage-overview" class="wpage active">
+      <div class="wallet-banner">
+        <div style="font-size:12px;opacity:.8;margin-bottom:4px">ShopBD Wallet Balance</div>
+        <div class="wbal">৳<span id="walletBal">4,820</span></div>
+        <div style="font-size:12px;opacity:.7;margin-top:4px">Available to withdraw or send</div>
+      </div>
+      <div class="qa-row">
+        <button class="qa-btn" onclick="switchWTab('send')"><span class="qai">&#10148;</span><span>Send</span></button>
+        <button class="qa-btn" onclick="switchWTab('methods')"><span class="qai">&#43;</span><span>Add Account</span></button>
+        <button class="qa-btn" onclick="doWithdraw()"><span class="qai">&#8595;</span><span>Withdraw</span></button>
+      </div>
+      <div class="wcard">
+        <div class="wcard-header">Recent Transactions</div>
+        <div id="txList"></div>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="switchWTab('ownerlogin')" style="background:none;border:1px solid var(--gray-300);padding:6px 14px;border-radius:4px;font-size:12px;color:var(--gray-600);cursor:pointer">&#128274; Owner Login</button>
+      </div>
+    </div>
+
+    <!-- PAYMENT METHODS -->
+    <div id="wpage-methods" class="wpage">
+      <div class="wcard">
+        <div class="wcard-header">My Payment Accounts
+          <button onclick="document.getElementById('addMethodSection').style.display='block'" style="background:var(--green);color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;cursor:pointer">+ Add</button>
+        </div>
+        <div id="methodsList"></div>
+      </div>
+      <div class="wcard" id="addMethodSection" style="display:none">
+        <div class="wcard-header">Add Payment Account
+          <button onclick="document.getElementById('addMethodSection').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-600)">&times;</button>
+        </div>
+        <div class="prov-grid">
+          <button class="prov-btn sel" onclick="selProv(this,'bKash')"><span class="pi">&#128247;</span>bKash</button>
+          <button class="prov-btn" onclick="selProv(this,'Nagad')"><span class="pi">&#128248;</span>Nagad</button>
+          <button class="prov-btn" onclick="selProv(this,'Rocket')"><span class="pi">&#128249;</span>Rocket</button>
+          <button class="prov-btn" onclick="selProv(this,'Upay')"><span class="pi">&#128250;</span>Upay</button>
+          <button class="prov-btn" onclick="selProv(this,'Bank')"><span class="pi">&#127968;</span>Bank</button>
+          <button class="prov-btn" onclick="selProv(this,'Card')"><span class="pi">&#128179;</span>Card</button>
+        </div>
+        <div id="provFields"></div>
+        <div style="display:flex;gap:8px">
+          <button onclick="saveMethod()" style="flex:1;background:var(--green);color:#fff;border:none;padding:10px;border-radius:4px;font-size:14px;cursor:pointer">Save Account</button>
+          <button onclick="document.getElementById('addMethodSection').style.display='none'" style="background:none;border:1px solid var(--gray-300);padding:10px 16px;border-radius:4px;font-size:14px;cursor:pointer">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEND -->
+    <div id="wpage-send" class="wpage">
+      <div class="wcard">
+        <div class="wcard-header">Send Money</div>
+        <div class="form-group"><label>Recipient phone / account</label><input type="text" id="sendTo" placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>Send via</label><select id="sendVia"><option value="">Select method...</option></select></div>
+        <div class="form-group"><label>Amount (৳)</label><input type="number" id="sendAmt" placeholder="0.00"></div>
+        <div class="form-group"><label>Note (optional)</label><input type="text" id="sendNote" placeholder="e.g. Order #BD-1234"></div>
+        <button onclick="doSend()" style="width:100%;background:var(--green);color:#fff;border:none;padding:11px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer">Send Now</button>
+      </div>
+      <div class="wcard">
+        <div class="wcard-header">Request Payment</div>
+        <div class="form-group"><label>Request from (phone)</label><input type="text" id="reqFrom" placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>Amount (৳)</label><input type="number" id="reqAmt" placeholder="0.00"></div>
+        <button onclick="doRequest()" style="width:100%;background:none;border:1px solid var(--green);color:var(--green);padding:11px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer">Generate Payment Link</button>
+      </div>
+    </div>
+
+    <!-- OWNER LOGIN -->
+    <div id="wpage-ownerlogin" class="wpage">
+      <div class="owner-login-wrap">
+        <div class="obox">
+          <div class="obox-head">
+            <h3>&#128274; Owner Login</h3>
+            <p>ShopBD admin access only</p>
+          </div>
+          <div class="obox-body">
+            <div class="oerr" id="oErr">Incorrect username or password.</div>
+            <div class="form-group"><label>Username</label><input type="text" id="oUser" placeholder="Username" autocomplete="off"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="oPass" placeholder="Password" onkeydown="if(event.key==='Enter')doOwnerLogin()"></div>
+            <button onclick="doOwnerLogin()" style="width:100%;background:var(--green-dark);color:#fff;border:none;padding:11px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px">Login as Owner</button>
+            <button onclick="switchWTab('overview')" style="width:100%;background:none;border:1px solid var(--gray-300);padding:9px;border-radius:4px;font-size:13px;cursor:pointer;margin-top:8px">&larr; Back to Wallet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OWNER PANEL (only visible after login) -->
+    <div id="wpage-owner" class="wpage">
+      <div class="owner-section">
+        <div class="owner-section-title">&#128274; Owner Panel &mdash; RAKESH (ShopBD Admin)
+          <button onclick="ownerLogout()" style="float:right;background:none;border:1px solid var(--orange);color:var(--orange);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer">Logout</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:#fff;border-radius:var(--radius);padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--green)">৳<span id="ownerBal">12,480</span></div>
+            <div style="font-size:11px;color:var(--gray-600);margin-top:2px">Platform earnings</div>
+          </div>
+          <div style="background:#fff;border-radius:var(--radius);padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--green)" id="ownerTxCount">342</div>
+            <div style="font-size:11px;color:var(--gray-600);margin-top:2px">Transactions</div>
+          </div>
+          <div style="background:#fff;border-radius:var(--radius);padding:10px;text-align:center">
+            <div style="font-size:18px;font-weight:700;color:var(--green)"><span id="commDisplay">1</span>%</div>
+            <div style="font-size:11px;color:var(--gray-600);margin-top:2px">Commission rate</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wcard">
+        <div class="wcard-header">Owner Payment Accounts
+          <button onclick="document.getElementById('ownerAddSection').style.display='block'" style="background:var(--green);color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:12px;cursor:pointer">+ Add</button>
+        </div>
+        <p style="font-size:12px;color:var(--gray-600);margin-bottom:10px">These accounts receive the 1% platform commission from every sale.</p>
+        <div id="ownerMethodsList"></div>
+      </div>
+
+      <div class="wcard" id="ownerAddSection" style="display:none">
+        <div class="wcard-header">Add Owner Account
+          <button onclick="document.getElementById('ownerAddSection').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--gray-600)">&times;</button>
+        </div>
+        <div class="prov-grid">
+          <button class="prov-btn sel" onclick="selOwnerProv(this,'bKash')"><span class="pi">&#128247;</span>bKash</button>
+          <button class="prov-btn" onclick="selOwnerProv(this,'Nagad')"><span class="pi">&#128248;</span>Nagad</button>
+          <button class="prov-btn" onclick="selOwnerProv(this,'Rocket')"><span class="pi">&#128249;</span>Rocket</button>
+          <button class="prov-btn" onclick="selOwnerProv(this,'Bank')"><span class="pi">&#127968;</span>Bank</button>
+        </div>
+        <div class="form-group"><label>Account number / phone</label><input type="text" id="oAccNum" placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>Account holder name</label><input type="text" id="oAccName" placeholder="Full name"></div>
+        <button onclick="saveOwnerMethod()" style="width:100%;background:var(--green);color:#fff;border:none;padding:10px;border-radius:4px;font-size:14px;cursor:pointer">Save Owner Account</button>
+      </div>
+
+      <div class="wcard">
+        <div class="wcard-header">Withdraw Platform Earnings</div>
+        <div class="form-row">
+          <div class="form-group"><label>Amount (৳)</label><input type="number" id="oWdAmt" placeholder="0.00"></div>
+          <div class="form-group"><label>Withdraw to</label><select id="oWdTo"><option>Select account...</option></select></div>
+        </div>
+        <button onclick="doOwnerWithdraw()" style="width:100%;background:var(--green);color:#fff;border:none;padding:10px;border-radius:4px;font-size:14px;cursor:pointer">Withdraw Earnings</button>
+      </div>
+
+      <div class="wcard">
+        <div class="wcard-header">Commission Settings</div>
+        <div class="form-row">
+          <div class="form-group"><label>Commission rate (%)</label><input type="number" id="commRate" value="1" min="0" max="20" step="0.1"></div>
+          <div class="form-group"><label>Min. payout (৳)</label><input type="number" id="minPay" value="500"></div>
+        </div>
+        <button onclick="saveCommission()" style="width:100%;background:none;border:1px solid var(--green);color:var(--green);padding:10px;border-radius:4px;font-size:14px;cursor:pointer">Save Settings</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-head">
+    <h3>&#128722; Your Cart</h3>
+    <button class="btn-close-x" onclick="toggleCart()">&times;</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="empty-cart"><p style="font-size:32px">&#128722;</p><p style="margin-top:10px">Your cart is empty</p></div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">৳0</span></div>
+    <button class="checkout-btn" onclick="goCheckout()">Proceed to Checkout</button>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Welcome to ShopBD</h3>
+      <button class="modal-close" onclick="closeAuth()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabLogin" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="modal-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+        <button class="modal-tab" id="tabSeller" onclick="switchAuthTab('seller')">Become Seller</button>
+      </div>
+      <div id="authLoginForm">
+        <div class="form-group"><label>Email or Phone</label><input type="text" id="loginEmail" placeholder="email@example.com or 01XXXXXXXXX"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password"></div>
+        <button class="form-submit" onclick="doLogin()">Sign In to ShopBD</button>
+        <p style="text-align:center;font-size:13px;margin-top:12px;color:var(--gray-600)">New? <a onclick="switchAuthTab('register')" style="color:var(--green);cursor:pointer">Create account</a></p>
+      </div>
+      <div id="authRegForm" style="display:none">
+        <div class="form-row">
+          <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Full name"></div>
+          <div class="form-group"><label>Phone</label><input type="text" id="regPhone" placeholder="01XXXXXXXXX"></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="email@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="regPass" placeholder="Min. 6 characters"></div>
+        <button class="form-submit" onclick="doRegister()">Create Account</button>
+      </div>
+      <div id="authSellerForm" style="display:none">
+        <div class="form-group"><label>Shop Name</label><input type="text" id="shopName" placeholder="e.g. Dhaka Electronics"></div>
+        <div class="form-group"><label>Business Type</label>
+          <select><option>Individual Seller</option><option>Small Business</option><option>Brand/Company</option></select>
+        </div>
+        <div class="form-group"><label>Phone</label><input type="text" placeholder="01XXXXXXXXX"></div>
+        <button class="form-submit" onclick="doSellerReg()">Register as Seller</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification"></div>
+
+<script>
+// OWNER CREDENTIALS
+var OWNER_USER='RAKESH';
+var OWNER_PASS='02082006';
+var isOwner=false;
+
+var products=[
+  {id:1,name:'Samsung Galaxy A54',price:32999,original:36999,emoji:'📱',cat:'electronics',rating:4.5,reviews:234},
+  {id:2,name:'Wireless Earbuds Pro',price:1850,original:2500,emoji:'🎧',cat:'electronics',rating:4.3,reviews:189},
+  {id:3,name:'Men\'s Panjabi Eid',price:1200,original:1800,emoji:'👕',cat:'fashion',rating:4.7,reviews:456},
+  {id:4,name:'Ladies Saree Cotton',price:950,original:1400,emoji:'👗',cat:'fashion',rating:4.6,reviews:312},
+  {id:5,name:'Rice Cooker 1.8L',price:2200,original:2800,emoji:'🍚',cat:'home',rating:4.4,reviews:98},
+  {id:6,name:'Basmati Rice 5kg',price:580,original:650,emoji:'🌾',cat:'groceries',rating:4.8,reviews:567},
+  {id:7,name:'Face Wash Neem',price:180,original:220,emoji:'🧴',cat:'beauty',rating:4.2,reviews:143},
+  {id:8,name:'Football Official',price:750,original:900,emoji:'⚽',cat:'sports',rating:4.5,reviews:76},
+  {id:9,name:'HSC Study Guide',price:350,original:450,emoji:'📚',cat:'books',rating:4.9,reviews:892},
+  {id:10,name:'Smart LED TV 32"',price:18500,original:22000,emoji:'📺',cat:'electronics',rating:4.4,reviews:145},
+  {id:11,name:'Kurti Printed',price:680,original:950,emoji:'👘',cat:'fashion',rating:4.6,reviews:231},
+  {id:12,name:'Mustard Oil 1L',price:220,original:260,emoji:'🫙',cat:'groceries',rating:4.7,reviews:342},
+];
+var cart=[];
+var sellerProducts=products.slice(0,5);
+var userMethods=[
+  {id:1,provider:'bKash',number:'01712-345678',name:'User',isDefault:true},
+  {id:2,provider:'Nagad',number:'01812-987654',name:'User',isDefault:false},
+];
+var ownerMethods=[
+  {id:1,provider:'bKash',number:'01911-000001',name:'RAKESH',isDefault:true},
+];
+var transactions=[
+  {type:'in',title:'Sale commission',sub:'Order #BD-4821 · bKash',amount:12,time:'2 min ago'},
+  {type:'in',title:'Sale commission',sub:'Order #BD-4820 · Nagad',amount:8,time:'14 min ago'},
+  {type:'out',title:'Sent to seller',sub:'Payout · bKash',amount:990,time:'1 hr ago'},
+  {type:'in',title:'Sale commission',sub:'Order #BD-4819',amount:34,time:'3 hrs ago'},
+  {type:'out',title:'Withdrew to bKash',sub:'Personal withdrawal',amount:2000,time:'Yesterday'},
+];
+var PROVS={bKash:{icon:'💜',color:'#9c27b0'},Nagad:{icon:'🟠',color:'#e65100'},Rocket:{icon:'🟤',color:'#795548'},Upay:{icon:'🔵',color:'#1565c0'},Bank:{icon:'🏦',color:'#37474f'},Card:{icon:'💳',color:'#1a237e'}};
+var curProv='bKash';
+var curOwnerProv='bKash';
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('page-'+p).classList.add('active');
+  window.scrollTo(0,0);
+  if(p==='checkout')updateCheckout();
+  if(p==='dashboard')updateDashboard();
+  if(p==='wallet'){renderTx();renderMethods();renderOwnerMethods();populateSendVia();populateOwnerWithdraw();}
+}
+function filterCat(cat){
+  showPage('home');
+  document.getElementById('productSectionTitle').textContent=cat==='all'?'All Products':cat.charAt(0).toUpperCase()+cat.slice(1);
+  renderProducts(cat==='all'?products:products.filter(function(p){return p.cat===cat;}));
+}
+function filterProducts(q){
+  var filtered=q?products.filter(function(p){return p.name.toLowerCase().includes(q.toLowerCase());}):products;
+  renderProducts(filtered);
+  document.getElementById('productSectionTitle').textContent=q?'Results for "'+q+'"':'Featured Products';
+}
+function renderProducts(list){
+  var g=document.getElementById('productsGrid');
+  if(!list.length){g.innerHTML='<p style="color:var(--gray-600);padding:20px">No products found.</p>';return;}
+  g.innerHTML=list.map(function(p){
+    return '<div class="product-card"><div class="product-img">'+p.emoji+'</div><div class="product-info"><h4>'+p.name+'</h4><div class="stars">★★★★☆ ('+p.reviews+')</div><div><span class="price">৳'+p.price.toLocaleString()+'</span><span class="original">৳'+p.original.toLocaleString()+'</span></div><div class="discount">'+Math.round((1-p.price/p.original)*100)+'% off</div><button class="add-cart-btn" onclick="addToCart({name:\''+p.name.replace(/'/g,"\\'")+'\'',price:'+p.price+',emoji:\''+p.emoji+'\'})">Add to Cart</button></div></div>';
+  }).join('');
+}
+function addToCart(item){
+  var ex=cart.find(function(c){return c.name===item.name;});
+  if(ex){ex.qty++;}else{cart.push(Object.assign({},item,{qty:1}));}
+  updateCartUI();
+  notify(item.emoji+' '+item.name+' added to cart!');
+}
+function updateCartUI(){
+  var count=cart.reduce(function(a,c){return a+c.qty;},0);
+  document.getElementById('cartCount').textContent=count;
+  var total=cart.reduce(function(a,c){return a+c.price*c.qty;},0);
+  document.getElementById('cartTotal').textContent='৳'+total.toLocaleString();
+  var el=document.getElementById('cartItems');
+  if(!cart.length){el.innerHTML='<div class="empty-cart"><p style="font-size:32px">🛒</p><p style="margin-top:10px">Your cart is empty</p></div>';return;}
+  el.innerHTML=cart.map(function(item,i){
+    return '<div class="cart-item"><div class="thumb">'+item.emoji+'</div><div class="details"><h5>'+item.name+'</h5><div class="cprice">৳'+item.price.toLocaleString()+'</div><div class="qty-ctrl"><button onclick="changeQty('+i+',-1)">−</button><span>'+item.qty+'</span><button onclick="changeQty('+i+',1)">+</button></div></div><button class="cart-remove" onclick="removeFromCart('+i+')">🗑</button></div>';
+  }).join('');
+}
+function changeQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);updateCartUI();}
+function removeFromCart(i){cart.splice(i,1);updateCartUI();}
+function toggleCart(){document.getElementById('cartPanel').classList.toggle('open');document.getElementById('cartOverlay').classList.toggle('open');}
+function goCheckout(){if(!cart.length){notify('Your cart is empty!');return;}toggleCart();showPage('checkout');}
+function updateCheckout(){
+  var el=document.getElementById('checkoutItems');
+  var sub=cart.reduce(function(a,c){return a+c.price*c.qty;},0);
+  el.innerHTML=cart.map(function(c){return '<div class="order-line"><span>'+c.emoji+' '+c.name+' x'+c.qty+'</span><span>৳'+(c.price*c.qty).toLocaleString()+'</span></div>';}).join('');
+  document.getElementById('checkoutSubtotal').textContent='৳'+sub.toLocaleString();
+  document.getElementById('checkoutTotal').textContent='৳'+(sub+60).toLocaleString();
+}
+function placeOrder(){cart=[];updateCartUI();notify('🎉 Order placed! Track it in your account.');setTimeout(function(){showPage('home');},1500);}
+function openAuth(tab){document.getElementById('authModal').classList.add('open');switchAuthTab(tab||'login');}
+function closeAuth(){document.getElementById('authModal').classList.remove('open');}
+function switchAuthTab(tab){
+  ['authLoginForm','authRegForm','authSellerForm'].forEach(function(f){document.getElementById(f).style.display='none';});
+  ['tabLogin','tabRegister','tabSeller'].forEach(function(t){document.getElementById(t).classList.remove('active');});
+  if(tab==='login'){document.getElementById('authLoginForm').style.display='block';document.getElementById('tabLogin').classList.add('active');}
+  else if(tab==='register'){document.getElementById('authRegForm').style.display='block';document.getElementById('tabRegister').classList.add('active');}
+  else if(tab==='seller'){document.getElementById('authSellerForm').style.display='block';document.getElementById('tabSeller').classList.add('active');}
+}
+function doLogin(){var e=document.getElementById('loginEmail').value;if(!e){notify('Enter email or phone',false);return;}document.getElementById('navUserLabel').textContent=e.split('@')[0]||e;closeAuth();notify('Welcome back to ShopBD! 👋');}
+function doRegister(){var n=document.getElementById('regName').value;if(!n){notify('Fill in all fields',false);return;}document.getElementById('navUserLabel').textContent=n;closeAuth();notify('Account created! Welcome 🎉');}
+function doSellerReg(){var s=document.getElementById('shopName').value;if(!s){notify('Enter shop name',false);return;}closeAuth();notify('Seller registered! Redirecting...');setTimeout(function(){showPage('dashboard');},1200);}
+function updateDashboard(){
+  document.getElementById('listingCount').textContent=sellerProducts.length;
+  var tb=document.getElementById('sellerProductTable');
+  tb.innerHTML=sellerProducts.map(function(p){
+    return '<tr><td>'+p.emoji+' '+p.name+'</td><td>৳'+p.price.toLocaleString()+'</td><td>'+Math.floor(Math.random()*50+5)+'</td><td><span class="status-badge badge-active">Active</span></td></tr>';
+  }).join('');
+}
+function addNewProduct(){
+  var name=document.getElementById('newProductName').value;
+  var price=parseInt(document.getElementById('newProductPrice').value)||0;
+  var cat=document.getElementById('newProductCat').value;
+  var emoji=document.getElementById('newProductEmoji').value||'📦';
+  if(!name||!price){notify('Enter product name and price',false);return;}
+  var np={id:Date.now(),name:name,price:price,original:Math.round(price*1.2),emoji:emoji,cat:cat,rating:5,reviews:0};
+  sellerProducts.push(np);products.push(np);
+  updateDashboard();notify('✅ '+name+' listed!');
+  document.getElementById('newProductName').value='';document.getElementById('newProductPrice').value='';document.getElementById('newProductStock').value='';document.getElementById('newProductEmoji').value='';
+}
+// WALLET
+function switchWTab(tab){
+  document.querySelectorAll('.wtab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.wpage').forEach(function(p){p.classList.remove('active');});
+  var el=document.getElementById('wpage-'+tab);
+  if(el)el.classList.add('active');
+  var tabs=document.querySelectorAll('.wtab');
+  var map={overview:0,methods:1,send:2,ownerlogin:3,owner:3};
+  if(map[tab]!==undefined&&tabs[map[tab]])tabs[map[tab]].classList.add('active');
+  if(tab==='methods')renderMethods();
+  if(tab==='send')populateSendVia();
+  if(tab==='owner'){renderOwnerMethods();populateOwnerWithdraw();}
+}
+function doOwnerLogin(){
+  var u=document.getElementById('oUser').value.trim();
+  var p=document.getElementById('oPass').value;
+  var err=document.getElementById('oErr');
+  if(u===OWNER_USER&&p===OWNER_PASS){
+    isOwner=true;err.style.display='none';
+    document.getElementById('ownerWTab').style.display='block';
+    switchWTab('owner');
+    notify('Welcome, RAKESH! 🛡️');
+  } else {
+    err.style.display='block';
+    document.getElementById('oPass').value='';
+  }
+}
+function ownerLogout(){
+  isOwner=false;
+  document.getElementById('ownerWTab').style.display='none';
+  document.getElementById('oUser').value='';
+  document.getElementById('oPass').value='';
+  switchWTab('overview');
+  notify('Logged out of owner panel.');
+}
+function renderTx(){
+  document.getElementById('txList').innerHTML=transactions.map(function(tx){
+    return '<div class="tx-row"><div class="tx-ic '+tx.type+'">'+(tx.type==='in'?'↓':'↑')+'</div><div class="tx-info"><div class="tx-t">'+tx.title+'</div><div class="tx-s">'+tx.sub+' · '+tx.time+'</div></div><div class="tx-amt '+tx.type+'">'+(tx.type==='in'?'+':'-')+'৳'+tx.amount.toLocaleString()+'</div></div>';
+  }).join('');
+}
+function renderMethods(){
+  var el=document.getElementById('methodsList');
+  if(!userMethods.length){el.innerHTML='<p style="font-size:13px;color:var(--gray-600);text-align:center;padding:16px">No payment accounts yet.</p>';return;}
+  el.innerHTML=userMethods.map(function(m){
+    return '<div class="method-item'+(m.isDefault?' def':'')+'"><div class="micon" style="background:'+(PROVS[m.provider]?.color||'#888')+'22;color:'+(PROVS[m.provider]?.color||'#888')+'">'+(PROVS[m.provider]?.icon||'💰')+'</div><div class="minfo"><div class="mname">'+m.provider+' '+(m.isDefault?'<span class="mbadge mbadge-def">Default</span>':'')+'</div><div class="mnum">'+m.number+' · '+m.name+'</div></div><div style="display:flex;gap:6px;align-items:center">'+((!m.isDefault)?'<button onclick="setDef('+m.id+')" style="background:none;border:1px solid var(--gray-300);padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer">Set default</button>':'')+'<button onclick="removeMethod('+m.id+')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-600)">🗑</button></div></div>';
+  }).join('');
+}
+function renderOwnerMethods(){
+  var el=document.getElementById('ownerMethodsList');
+  if(!ownerMethods.length){el.innerHTML='<p style="font-size:13px;color:var(--gray-600);text-align:center;padding:16px">No owner accounts yet.</p>';return;}
+  el.innerHTML=ownerMethods.map(function(m){
+    return '<div class="method-item'+(m.isDefault?' def':'')+'"><div class="micon" style="background:'+(PROVS[m.provider]?.color||'#888')+'22;color:'+(PROVS[m.provider]?.color||'#888')+'">'+(PROVS[m.provider]?.icon||'💰')+'</div><div class="minfo"><div class="mname">'+m.provider+' <span class="mbadge mbadge-owner">Owner</span></div><div class="mnum">'+m.number+' · '+m.name+'</div></div><button onclick="removeOwnerMethod('+m.id+')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-600)">🗑</button></div>';
+  }).join('');
+  populateOwnerWithdraw();
+}
+function populateSendVia(){
+  var s=document.getElementById('sendVia');
+  s.innerHTML='<option value="">Select method...</option>'+userMethods.map(function(m){return '<option value="'+m.id+'">'+m.provider+' · '+m.number+'</option>';}).join('');
+}
+function populateOwnerWithdraw(){
+  var s=document.getElementById('oWdTo');
+  s.innerHTML='<option>Select account...</option>'+ownerMethods.map(function(m){return '<option>'+m.provider+' · '+m.number+'</option>';}).join('');
+}
+function selProv(btn,name){
+  document.querySelectorAll('#addMethodSection .prov-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');curProv=name;updateProvFields();
+}
+function selOwnerProv(btn,name){
+  document.querySelectorAll('#ownerAddSection .prov-btn').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');curOwnerProv=name;
+}
+function updateProvFields(){
+  var isBank=curProv==='Bank',isCard=curProv==='Card';
+  document.getElementById('provFields').innerHTML=isBank?
+    '<div class="form-group"><label>Bank name</label><input type="text" id="bankName" placeholder="e.g. Dutch Bangla Bank"></div><div class="form-group"><label>Account number</label><input type="text" id="accNum2" placeholder="Account number"></div><div class="form-group"><label>Holder name</label><input type="text" id="holderName2" placeholder="Full name"></div>'
+    :isCard?
+    '<div class="form-group"><label>Card number</label><input type="text" id="cardNum" placeholder="XXXX XXXX XXXX XXXX"></div><div class="form-row"><div class="form-group"><label>Expiry</label><input type="text" id="cardExp" placeholder="MM/YY"></div><div class="form-group"><label>Name on card</label><input type="text" id="cardName" placeholder="Full name"></div></div>'
+    :
+    '<div class="form-group"><label>Phone number</label><input type="text" id="mobileNum" placeholder="01XXXXXXXXX"></div><div class="form-group"><label>Holder name</label><input type="text" id="holderName" placeholder="Full name"></div>';
+}
+function saveMethod(){
+  var isBank=curProv==='Bank',isCard=curProv==='Card';
+  var number,name;
+  if(isBank){number=document.getElementById('accNum2')?.value;name=document.getElementById('holderName2')?.value;}
+  else if(isCard){number=document.getElementById('cardNum')?.value;name=document.getElementById('cardName')?.value;}
+  else{number=document.getElementById('mobileNum')?.value;name=document.getElementById('holderName')?.value;}
+  if(!number||!name){notify('Fill in all fields',false);return;}
+  userMethods.push({id:Date.now(),provider:curProv,number:number,name:name,isDefault:userMethods.length===0});
+  document.getElementById('addMethodSection').style.display='none';
+  renderMethods();populateSendVia();
+  notify(curProv+' account added! ✅');
+}
+function saveOwnerMethod(){
+  var number=document.getElementById('oAccNum').value;
+  var name=document.getElementById('oAccName').value;
+  if(!number||!name){notify('Fill in all fields',false);return;}
+  ownerMethods.push({id:Date.now(),provider:curOwnerProv,number:number,name:name,isDefault:ownerMethods.length===0});
+  document.getElementById('ownerAddSection').style.display='none';
+  document.getElementById('oAccNum').value='';document.getElementById('oAccName').value='';
+  renderOwnerMethods();notify('Owner '+curOwnerProv+' account added!');
+}
+function setDef(id){userMethods.forEach(function(m){m.isDefault=m.id===id;});renderMethods();notify('Default account updated.');}
+function removeMethod(id){userMethods=userMethods.filter(function(m){return m.id!==id;});if(userMethods.length&&!userMethods.some(function(m){return m.isDefault;}))userMethods[0].isDefault=true;renderMethods();notify('Account removed.');}
+function removeOwnerMethod(id){ownerMethods=ownerMethods.filter(function(m){return m.id!==id;});renderOwnerMethods();notify('Owner account removed.');}
+function doSend(){
+  var to=document.getElementById('sendTo').value;
+  var amt=parseInt(document.getElementById('sendAmt').value)||0;
+  var note=document.getElementById('sendNote').value||'Transfer';
+  var via=document.getElementById('sendVia');
+  var viaText=via.options[via.selectedIndex]?.text||'';
+  if(!to||!amt){notify('Fill in recipient and amount',false);return;}
+  if(!via.value){notify('Select a payment method',false);return;}
+  transactions.unshift({type:'out',title:'Sent to '+to,sub:note+' · '+viaText.split('·')[0].trim(),amount:amt,time:'Just now'});
+  var bal=parseInt(document.getElementById('walletBal').textContent.replace(/,/g,''))-amt;
+  document.getElementById('walletBal').textContent=Math.max(0,bal).toLocaleString();
+  renderTx();
+  document.getElementById('sendTo').value='';document.getElementById('sendAmt').value='';document.getElementById('sendNote').value='';
+  notify('৳'+amt.toLocaleString()+' sent to '+to+'!');
+  switchWTab('overview');
+}
+function doRequest(){
+  var from=document.getElementById('reqFrom').value;
+  var amt=parseInt(document.getElementById('reqAmt').value)||0;
+  if(!from||!amt){notify('Fill in all fields',false);return;}
+  notify('Payment link generated! Requesting ৳'+amt.toLocaleString()+' from '+from);
+}
+function doWithdraw(){
+  var def=userMethods.find(function(m){return m.isDefault;});
+  if(!def){notify('Add a payment account first',false);switchWTab('methods');return;}
+  notify('Withdraw request sent to '+def.provider+' · '+def.number);
+}
+function doOwnerWithdraw(){
+  var amt=parseInt(document.getElementById('oWdAmt').value)||0;
+  var sel=document.getElementById('oWdTo');
+  if(!amt){notify('Enter withdrawal amount',false);return;}
+  if(sel.selectedIndex===0){notify('Select an account',false);return;}
+  var cur=parseInt(document.getElementById('ownerBal').textContent.replace(/,/g,''));
+  if(amt>cur){notify('Exceeds platform balance',false);return;}
+  document.getElementById('ownerBal').textContent=(cur-amt).toLocaleString();
+  document.getElementById('oWdAmt').value='';
+  notify('৳'+amt.toLocaleString()+' withdrawn!');
+}
+function saveCommission(){
+  var rate=document.getElementById('commRate').value;
+  document.getElementById('commDisplay').textContent=parseFloat(rate).toFixed(1).replace(/\.0$/,'');
+  notify('Commission updated to '+rate+'%');
+}
+function notify(msg,ok){
+  if(ok===undefined)ok=true;
+  var el=document.getElementById('notification');
+  el.textContent=msg;
+  el.style.background=ok?'var(--green)':'var(--orange)';
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},3000);
+}
+
+// INIT
+renderProducts(products);
+updateCartUI();
+updateProvFields();
+</script>
+</body>
+</html>
